@@ -1,0 +1,73 @@
+<h1>Pokemon TCG Search</h1>
+
+<div class="mb-3">
+    <input type="text" class="form-control" @bind="SearchTerm" @bind:event="oninput" placeholder="Search for a Pokemon card..." />
+    <button class="btn btn-primary mt-2" @onclick="SearchCards" disabled="@IsLoading">
+        @if (IsLoading)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="visually-hidden">Loading...</span>
+        }
+        else
+        {
+            <span>Search</span>
+        }
+    </button>
+</div>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @(ActiveTab == "search" ? "active" : "")" @onclick="() => ActiveTab = "search"">
+            Search Results
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @(ActiveTab == "favorites" ? "active" : "")" @onclick="() => ActiveTab = "favorites"">
+            Favorites (@FavoritesCount)
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content mt-3">
+    @if (ActiveTab == "search")
+    {
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
+            @foreach (var card in SearchResults)
+            {
+                <div class="col">
+                    <PokemonCard Card="card" />
+                </div>
+            }
+        </div>
+    }
+    else if (ActiveTab == "favorites")
+    {
+        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-4">
+            @foreach (var card in FavoritesService.GetFavorites())
+            {
+                <div class="col">
+                    <PokemonCard Card="card" />
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private string SearchTerm { get; set; } = string.Empty;
+    private List<Card> SearchResults { get; set; } = new List<Card>();
+    private bool IsLoading { get; set; }
+    private string ActiveTab { get; set; } = "search";
+
+    // Get the count of favorites
+    private int FavoritesCount => FavoritesService.GetFavorites().Count;
+
+    private async Task SearchCards()
+    {
+        if (string.IsNullOrWhiteSpace(SearchTerm)) return;
+
+        IsLoading = true;
+        SearchResults = await PokemonService.SearchCardsAsync(SearchTerm);
+        IsLoading = false;
+    }
+}
