@@ -1,0 +1,33 @@
+.card{
+    position: relative;
+    cursor: pointer;
+    transition: transform 0,2s;
+}
+
+.card:hover{
+    transform: scale(1.05);
+}
+
+.card-buttons{
+    position:absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    gap: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.card.hover .card-buttons{
+    opacity: 1;
+}
+
+.card-name{
+    text-align: center;
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
